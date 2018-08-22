@@ -1,0 +1,2 @@
+# Hijiki4thVoiceroidKitchen
+第4回ひじき祭りVOICEROIDキッチンデータ収集
