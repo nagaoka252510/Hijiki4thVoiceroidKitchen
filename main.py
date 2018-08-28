@@ -10,23 +10,39 @@ NICO_CONTENTS_SEARCH_API_END_POINT = "http://api.search.nicovideo.jp/api/v2/vide
 
 DB_PATH = "env/kitchen_db.db"
 
-def search_voiro_kitchen_hijiki():
-    # TODO APIを叩くURLの生成は別クラスにまとめたい
+def search_voiro_kitchen_hijiki(*keywords):
+    search_keywords = "VOICEROIDキッチン"
+    if len(convert_tuple_to_str(keywords)) > 0:
+        search_keywords = convert_tuple_to_str(keywords)
+
     search_url = NICO_CONTENTS_SEARCH_API_END_POINT
-    search_url += "?q=" + urlparse.quote("VOICEROIDキッチン 第四回ひじき祭")
+    search_url += "?q=" + urlparse.quote(search_keywords)
     search_url += "&targets=tagsExact"
     search_url += "&_limit=100"
     search_url += "&_sort=-viewCounter"
     search_url += "&_context=apitest"
     search_url += "&fields=contentId,title,description,tags,categoryTags,viewCounter,mylistCounter,commentCounter,startTime,lastCommentTime,lengthSeconds"
 
-    #print(search_url)
+    print(search_url)
 
     r = requests.get(search_url)
     req_json = json.dumps(r.json(),ensure_ascii=False)
+    print(req_json)
     req_json_dict = json.loads(req_json)
 
     return req_json_dict
+
+def convert_tuple_to_str(tpl):
+    search_keywords = ""
+    print(tpl)
+    if len(tpl) > 0:
+        for word in tpl:
+            #print(word)
+            search_keywords += str(word) + " "
+        search_keywords.rstrip()
+
+    #print(search_keywords)
+    return search_keywords
 
 def insert_json_data(json_dict):
     with contextlib.closing(sqlite3.connect(DB_PATH)) as con:
@@ -90,5 +106,5 @@ def insert_json_data(json_dict):
         con.commit()
 
 if __name__ == "__main__":
-    data = search_voiro_kitchen_hijiki()
+    data = search_voiro_kitchen_hijiki("VOICEROIDキッチン", "第四回ひじき祭")
     insert_json_data(data)
